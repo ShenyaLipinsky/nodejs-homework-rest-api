@@ -6,38 +6,6 @@ const addSchema = Joi.object({
     .trim()
     .min(3)
     .required()
-    .error(RequestError(400, "missing required name field")),
-  email: Joi.string()
-    .trim()
-    .email({
-      minDomainSegments: 2,
-    })
-    .required()
-    .error(
-      RequestError(400, "missing required email field or domain not allowed")
-    ),
-
-  phone: Joi.string()
-    .pattern(/^[0-9]+$/, "numbers")
-    .trim()
-    .min(3)
-    .max(12)
-    .required()
-    .error(
-      RequestError(
-        400,
-        "phone length must contain only digits and must have more than 3 and less 12 symbols"
-      )
-    ),
-})
-  .min(3)
-  .required();
-
-const putAndPatchSchema = Joi.object({
-  name: Joi.string()
-    .trim()
-    .min(3)
-    .optional()
     .error(
       RequestError(
         400,
@@ -49,29 +17,33 @@ const putAndPatchSchema = Joi.object({
     .email({
       minDomainSegments: 2,
     })
-    .optional()
+    .required()
     .error(
       RequestError(
         400,
-        "Email can't be empty and must contain domain more than 2 symbols "
+        "Email can't be empty and must contain domain more than 2 symbols"
       )
     ),
 
   phone: Joi.string()
     .pattern(/^[0-9]+$/, "numbers")
     .trim()
-    .min(3)
-    .max(12)
-    .optional()
+    .min(6)
+    .max(13)
+    .required()
     .error(
       RequestError(
         400,
-        "Phone can't be empty and must contain more than 3 and less than 13 symbols"
+        "Phone can't be empty and must contain more than 6 and less than 13 symbols"
       )
     ),
-}).required();
+})
+  .min(3)
+  .required()
+  .error(
+    RequestError(400, "Invalid data, request must contain: name email phone.")
+  );
 
 module.exports = {
   addSchema,
-  putAndPatchSchema,
 };
