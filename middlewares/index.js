@@ -1,9 +1,9 @@
 const validation = require("./validation");
-const isValidId = require("./isValidId");
 const handleSaveErorrs = require("./handleSaveErorrs");
+const validationParams = require("./validationParams");
 
 module.exports = {
   validation,
   handleSaveErorrs,
-  isValidId,
+  validationParams,
 };
