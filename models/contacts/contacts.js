@@ -1,4 +1,5 @@
 const { Schema, model } = require("mongoose");
+
 const Joi = require("joi");
 
 const { handleSaveErorrs } = require("../../middlewares");
@@ -82,9 +83,17 @@ const updateFavorite = Joi.object({
     .error(RequestError(400, "missing field favorite")),
 });
 
+const validateId = Joi.object({
+  contactId: Joi.string()
+    .min(24)
+    .max(24)
+    .error(RequestError(400, "Invalid ID. ID must contain 24 symbols")),
+});
+
 const schemas = {
   addSchema,
   updateFavorite,
+  validateId,
 };
 
 const Contact = model("contact", contactSchema);
