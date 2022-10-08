@@ -1,7 +1,8 @@
-const contacts = require("../../models/contacts/contacts");
+const { Contact } = require("../../models/contacts/contacts");
 
 const addContact = async (req, res) => {
-  const result = await contacts.addContact(req.body);
+  console.log(req.body);
+  const result = await Contact.create(req.body);
 
   res.status(201).json(result);
 };
