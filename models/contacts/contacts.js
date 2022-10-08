@@ -1,59 +1,95 @@
-const fs = require("fs/promises");
-const { nanoid } = require("nanoid");
-const path = require("path");
+const { Schema, model } = require("mongoose");
+const Joi = require("joi");
 
-const contactsPath = path.join(__dirname, "./contacts.json");
+const { handleSaveErorrs } = require("../../middlewares");
+const { RequestError } = require("../../helpers");
 
-const updateContacts = async (contacts) =>
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+const phoneRegexp = /^[0-9]+$/;
 
-const listContacts = async () => {
-  const data = await fs.readFile(contactsPath);
-  return JSON.parse(data);
+const contactSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Set name for contact"],
+    },
+    email: {
+      type: String,
+    },
+    phone: {
+      type: String,
+      match: phoneRegexp,
+    },
+    favorite: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { versionKey: false, timestamps: true }
+);
+
+contactSchema.post("save", handleSaveErorrs);
+
+const addSchema = Joi.object({
+  name: Joi.string()
+    .trim()
+    .min(3)
+    .required()
+    .error(
+      RequestError(
+        400,
+        "Name can't be empty and must contain more than 3 symbols"
+      )
+    ),
+  email: Joi.string()
+    .trim()
+    .email({
+      minDomainSegments: 2,
+    })
+    .required()
+    .error(
+      RequestError(
+        400,
+        "Email can't be empty and must contain domain more than 2 symbols"
+      )
+    ),
+
+  phone: Joi.string()
+    .pattern(phoneRegexp, "numbers")
+    .trim()
+    .min(6)
+    .max(13)
+    .required()
+    .error(
+      RequestError(
+        400,
+        "Phone can't be empty and must contain more than 6 and less than 13 symbols"
+      )
+    ),
+  favorite: Joi.boolean().optional().default(false),
+})
+  .min(3)
+  .required()
+  .error(
+    RequestError(
+      400,
+      "Invalid data, request must contain: (name, email, phone) = string format, favorite is optional."
+    )
+  );
+
+const updateFavorite = Joi.object({
+  favorite: Joi.boolean()
+    .required()
+    .error(RequestError(400, "missing field favorite")),
+});
+
+const schemas = {
+  addSchema,
+  updateFavorite,
 };
 
-const getContactById = async (contactId) => {
-  const contacts = await listContacts();
-  const result = contacts.find((contact) => contact.id === contactId);
-  return result || null;
-};
-
-const removeContact = async (contactId) => {
-  const contacts = await listContacts();
-  const index = contacts.findIndex((contact) => contact.id === contactId);
-  if (index === -1) {
-    return null;
-  }
-  const [result] = contacts.splice(index, 1);
-  await updateContacts(contacts);
-  return result;
-};
-
-const addContact = async (body) => {
-  const contacts = await listContacts();
-  const newContact = {
-    id: nanoid(3),
-    ...body,
-  };
-  contacts.push(newContact);
-  await updateContacts(contacts);
-  return newContact;
-};
-const updateContact = async (contactId, body) => {
-  const contacts = await listContacts();
-  const index = contacts.findIndex((contact) => contact.id === contactId);
-  if (index === -1) {
-    return null;
-  }
-  contacts[index] = { id: contactId, ...body };
-  await updateContacts(contacts);
-  return contacts[index];
-};
+const Contact = model("contact", contactSchema);
 
 module.exports = {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
+  Contact,
+  schemas,
 };
