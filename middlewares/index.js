@@ -1,9 +1,11 @@
 const validation = require("./validation");
-const handleSaveErorrs = require("./handleSaveErorrs");
+const handleSaveErrors = require("../helpers/handleSaveErrors");
 const validationParams = require("./validationParams");
+const auth = require("./auth");
 
 module.exports = {
   validation,
-  handleSaveErorrs,
+  handleSaveErrors,
   validationParams,
+  auth,
 };
