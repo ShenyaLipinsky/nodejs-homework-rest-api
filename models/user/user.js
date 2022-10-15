@@ -28,16 +28,6 @@ const userSchema = new Schema(
 userSchema.post("save", handleSaveErrors);
 
 const registerSchema = Joi.object({
-  name: Joi.string()
-    .trim()
-    .min(3)
-    .required()
-    .error(
-      RequestError(
-        400,
-        "Name can't be empty and must contain more than 3 symbols"
-      )
-    ),
   email: Joi.string()
     .trim()
     .email({
