@@ -28,16 +28,16 @@ const userSchema = new Schema(
 userSchema.post("save", handleSaveErrors);
 
 const registerSchema = Joi.object({
-  // name: Joi.string()
-  //   .trim()
-  //   .min(3)
-  //   .required()
-  //   .error(
-  //     RequestError(
-  //       400,
-  //       "Name can't be empty and must contain more than 3 symbols"
-  //     )
-  //   ),
+  name: Joi.string()
+    .trim()
+    .min(3)
+    .required()
+    .error(
+      RequestError(
+        400,
+        "Name can't be empty and must contain more than 3 symbols"
+      )
+    ),
   email: Joi.string()
     .trim()
     .email({
@@ -51,6 +51,15 @@ const registerSchema = Joi.object({
       )
     ),
   password: Joi.string().min(6).required(),
+  subscription: Joi.string()
+    .valid("starter", "pro", "business")
+    .optional()
+    .error(
+      RequestError(
+        400,
+        `Subscription only "starter", "pro", and "business" allowed `
+      )
+    ),
 });
 
 const loginSchema = Joi.object({
@@ -76,7 +85,6 @@ const loginSchema = Joi.object({
       )
     ),
 });
-
 
 const schemas = {
   registerSchema,
