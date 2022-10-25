@@ -1,9 +1,7 @@
 const { Schema, model } = require("mongoose");
-
 const Joi = require("joi");
 
-const { handleSaveErorrs } = require("../../middlewares");
-const { RequestError } = require("../../helpers");
+const { RequestError, handleSaveErrors } = require("../../helpers");
 
 const phoneRegexp = /^[0-9]+$/;
 
@@ -24,11 +22,15 @@ const contactSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
+    },
   },
   { versionKey: false, timestamps: true }
 );
 
-contactSchema.post("save", handleSaveErorrs);
+contactSchema.post("save", handleSaveErrors);
 
 const addSchema = Joi.object({
   name: Joi.string()
