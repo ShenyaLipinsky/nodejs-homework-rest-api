@@ -1,15 +1,18 @@
 const express = require("express");
 
-const { validation, auth } = require("../../middlewares");
-
-const { ctrlWrapper } = require("../../helpers");
-
 const { schemas } = require("../../models/user/user");
-
+const { auth, upload, validation } = require("../../middlewares");
+const { ctrlWrapper } = require("../../helpers");
 const ctrl = require("../../controllers/auth");
 
 const router = express.Router();
 
+router.patch(
+  "/avatars",
+  auth,
+  upload.single("avatar"),
+  ctrlWrapper(ctrl.updateAvatar)
+);
 router.post(
   "/register",
   validation(schemas.registerSchema),
