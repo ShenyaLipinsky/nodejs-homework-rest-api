@@ -25,6 +25,14 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    verify: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      required: [true, "Verify token is required"],
+    },
   },
   { versionKey: false, timestamps: true }
 );
@@ -56,6 +64,21 @@ const registerSchema = Joi.object({
     ),
 });
 
+const verifyEmailSchema = Joi.object({
+  email: Joi.string()
+    .trim()
+    .email({
+      minDomainSegments: 2,
+    })
+    .required()
+    .error(
+      RequestError(
+        400,
+        "Email can't be empty and must contain domain more than 2 symbols"
+      )
+    ),
+});
+
 const loginSchema = Joi.object({
   email: Joi.string()
     .trim()
@@ -83,6 +106,7 @@ const loginSchema = Joi.object({
 const schemas = {
   registerSchema,
   loginSchema,
+  verifyEmailSchema,
 };
 
 const User = model("user", userSchema);
